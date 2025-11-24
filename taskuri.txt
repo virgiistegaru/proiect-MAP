@@ -1,0 +1,2 @@
+6,hh,5,2025-11-25,Necompletat
+qqq,www,3,2026-12-23,Completat
