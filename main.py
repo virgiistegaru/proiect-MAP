@@ -86,8 +86,35 @@ def stergere_total():
     with open('taskuri.txt', 'w') as f:
         f.write('')
 
+def editare_task():
+    task=input('Introduceti numele task-ului de editat: ')
+    camp=input('Introduceti campul de editat (nume, descriere, prioritate, data): ')
+    update=input('Introduceti update-ul: ')
+    with open('taskuri.txt', 'r') as f:
+        taskuri = f.readlines()
+        for idx, t in enumerate(taskuri):
+            task_info = t.strip().split(',')
+            if task_info[0] == task:
+                if camp == 'nume':
+                    task_info[0] = update
+                elif camp == 'descriere':
+                    task_info[1] = update
+                elif camp == 'prioritate':
+                    task_info[2] = update
+                elif camp == 'data':
+                    task_info[3] = update
+                else:
+                    print('Camp invalid.')
+                    return
+                taskuri[idx] = ','.join(task_info) + '\n'
+                print(f'Task-ul "{task_info[0]}" a fost actualizat.')
+                break
+        if not any(task_info[0] == task for task in taskuri):
+            print(f'Task-ul "{task}" nu a fost gasit.')
+    with open('taskuri.txt', 'w') as f:
+        f.writelines(taskuri)
 
-
+print('Bine ati venit in aplicatia de gestionare a taskurilor!')
 while(1):
     print('Alegeti o optiune:')
     print('1. Afisare lista taskuri')
@@ -95,8 +122,17 @@ while(1):
     print('3. Stergere task')
     print('4. Modificare status task (complet/incomplet)')
     print('5. Stergere toate taskurile')
-    print('6. Iesire')
-    optiune = input('Introduceti optiunea (1-6): ')
+    print('6. Editare task')
+    print('7. Iesire')
+    print('Statistici:')
+    with open('taskuri.txt', 'r') as f:
+        taskuri = f.readlines()
+        total_taskuri = len(taskuri)
+        taskuri_completate = sum(1 for task in taskuri if task.strip().split(',')[4] == 'Completat')
+        rata_finalizare = (taskuri_completate / total_taskuri * 100) if total_taskuri > 0 else 0
+        taskuri_depasite = sum(1 for task in taskuri if datetime.strptime(task.strip().split(',')[3], '%Y-%m-%d').date() < date.today() and task.strip().split(',')[4] == 'Necompletat')
+        print(f'Total taskuri: {total_taskuri}, Rata finalizare: {rata_finalizare}%, Taskuri depasite: {taskuri_depasite}')
+    optiune = input('Introduceti optiunea (1-7): ')
     if optiune == '1':
         afisare_taskuri()
     elif optiune == '2':
@@ -108,9 +144,10 @@ while(1):
     elif optiune == '5':   
         stergere_total()
     elif optiune == '6':
-        print('Iesire din aplicatie.')
+        editare_task()
+    elif optiune == '7':
+        print('Iesire din aplicatie...')
         break
     else:
         print('Optiune invalida. Incercati din nou.')
-    
-    
+      
