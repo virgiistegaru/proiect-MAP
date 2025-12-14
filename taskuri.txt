@@ -1,1 +1,2 @@
-plm,mmmmm,4,2026-12-09,Completat
+cumparaturi,cumparaturi saptamanale,4,2025-12-15,Completat
+cumparaturi cadouri,cadouri de craciun,3,2025-12-23,Necompletat
