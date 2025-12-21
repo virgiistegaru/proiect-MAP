@@ -1,5 +1,7 @@
 from datetime import datetime, date
 
+from tabulate import tabulate
+
 def sortare_taskuri_dupa_prioritate():
     with open('taskuri.txt', 'r') as f:
         taskuri = f.readlines()
@@ -8,17 +10,34 @@ def sortare_taskuri_dupa_prioritate():
         f.writelines(taskuri)
 
 def afisare_taskuri():
-    print('-----------------------------------')
-    print
+
+    sortare_taskuri_dupa_prioritate()
+
     with open('taskuri.txt', 'r') as f:
-        sortare_taskuri_dupa_prioritate()
         taskuri = f.readlines()
-        for idx, task in enumerate(taskuri):
-            task_info = task.strip().split(',')
-            print(f"{idx + 1}. Task: {task_info[0]}, Descriere: {task_info[1]}, Prioritate: {task_info[2]}, Data limita: {task_info[3]}, Status: {task_info[4]}")
-        if not taskuri:
-            print('Nu exista taskuri in lista.')
-    print('-----------------------------------')
+
+    if not taskuri:
+        print('Nu exista taskuri in lista.')
+        print('-----------------------------------')
+        return
+
+    tabel = []  
+
+    for task in taskuri:
+        task_info = task.strip().split(',')
+        tabel.append([
+            task_info[0],
+            task_info[1],
+            task_info[2],
+            task_info[3],
+            task_info[4]
+        ])
+
+    antet = ['Nume Task', 'Descriere', 'Prioritate', 'Data Limita', 'Status']
+
+    print(tabulate(tabel, headers=antet, tablefmt='grid'))
+    
+
 
 def adaugare_task():
     print('-----------------------------------')
@@ -160,7 +179,40 @@ while(1):
     
     optiune = input('Introduceti optiunea (1-8): ')
     if optiune == '1':
-        afisare_taskuri()
+        print('Doriti filtrarea taskurilor? (Da/Nu)')
+        filtrare = input().lower()
+        if filtrare == 'da':
+            print('Alegeti filtrul:')
+            print('1. Doar taskuri necompletate')
+            print('2. Doar taskuri completate')
+            print('3. Taskuri cu prioritate mare (4-5)')
+            print('4. Taskuri cu data limita apropiata (3 zile)')
+            filtru = input('Introduceti optiunea (1-4): ')
+            with open('taskuri.txt', 'r') as f:
+                taskuri = f.readlines()
+                filtrate = []
+                for task in taskuri:
+                    task_info = task.strip().split(',')
+                    if filtru == '1' and task_info[4] == 'Necompletat':
+                        filtrate.append(task)
+                    elif filtru == '2' and task_info[4] == 'Completat':
+                        filtrate.append(task)
+                    elif filtru == '3' and int(task_info[2]) >= 4:
+                        filtrate.append(task)
+                    elif filtru == '4':
+                        ddl = datetime.strptime(task_info[3], '%Y-%m-%d').date()
+                        if 0 <= (ddl - date.today()).days <= 3:
+                            filtrate.append(task)
+                if filtrate:
+                    print('-----------------------------------')
+                    for idx, task in enumerate(filtrate):
+                        task_info = task.strip().split(',')
+                        print(f"{idx + 1}. Task: {task_info[0]}, Descriere: {task_info[1]}, Prioritate: {task_info[2]}, Data limita: {task_info[3]}, Status: {task_info[4]}")
+                    print('-----------------------------------')
+                else:
+                    print('Nu exista taskuri care sa corespunda filtrului ales.')
+        else:
+            afisare_taskuri()
     elif optiune == '2':
         adaugare_task()
     elif optiune=='3':
@@ -185,6 +237,23 @@ while(1):
         total_taskuri = len(taskuri)
         taskuri_completate = sum(1 for task in taskuri if task.strip().split(',')[4] == 'Completat')
         rata_finalizare = (taskuri_completate / total_taskuri * 100) if total_taskuri > 0 else 0
-        taskuri_depasite = sum(1 for task in taskuri if datetime.strptime(task.strip().split(',')[3], '%Y-%m-%d').date() < date.today() and task.strip().split(',')[4] == 'Necompletat')
+        taskuri_depasite = sum(1 for task in taskuri if datetime.strptime(task.strip().split(',')[3], '%d-%m-%Y').date() < date.today() and task.strip().split(',')[4] == 'Necompletat')
         print(f'Total taskuri: {total_taskuri}, Rata finalizare: {rata_finalizare}%, Taskuri depasite: {taskuri_depasite}')
+    print('*********************************')
+    print('Notificari:')
+    with open('taskuri.txt', 'r') as f:
+        taskuri = f.readlines()
+        notificari = False
+        for task in taskuri:
+            task_info = task.strip().split(',')
+            ddl = datetime.strptime(task_info[3], '%d-%m-%Y').date()
+            if (ddl - date.today()).days <= 1 and task_info[4] == 'Necompletat':
+                print(f'Astazi este termenul limita pentru task-ul: "{task_info[0]}".')
+                notificari = True
+            if ddl < date.today() and task_info[4] == 'Necompletat':
+                print(f'Termenul limita pentru task-ul: "{task_info[0]}" a fost depasit!')
+                notificari = True
+        if not notificari:
+            print('Nu aveti notificari pentru astazi.')
     print('===================================') 
+    

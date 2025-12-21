@@ -1,2 +1,3 @@
-cumparaturi,cumparaturi saptamanale,4,2025-12-15,Completat
-cumparaturi cadouri,cadouri de craciun,3,2025-12-23,Necompletat
+facturi,plata facturi,5,22-12-2025,Completat
+cumparaturi,cumparaturi saptamanale,4,15-12-2025,Necompletat
+cumparaturi cadouri,cadouri de craciun,3,23-12-2025,Necompletat
