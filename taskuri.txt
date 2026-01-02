@@ -1,3 +1,3 @@
-facturi,plata facturi,5,22-12-2025,Completat
-cumparaturi,cumparaturi saptamanale,4,15-12-2025,Necompletat
-cumparaturi cadouri,cadouri de craciun,3,23-12-2025,Necompletat
+Cumparaturi,Cumparaturi saptamanale,3,10-06-2025,Completat,casa
+Curatenie,Curatenie generala,2,15-06-2025,Necompletat,casa
+Proiect MAP,Finalizare proiect MAP,1,20-06-2025,Necompletat,facultate

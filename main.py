@@ -25,15 +25,18 @@ def afisare_taskuri():
 
     for task in taskuri:
         task_info = task.strip().split(',')
+        categorii = task_info[5].split('|')if len(task_info) > 5 else []
         tabel.append([
             task_info[0],
             task_info[1],
             task_info[2],
             task_info[3],
-            task_info[4]
+            task_info[4],
+            ', '.join(categorii)
+
         ])
 
-    antet = ['Nume Task', 'Descriere', 'Prioritate', 'Data Limita', 'Status']
+    antet = ['Nume Task', 'Descriere', 'Prioritate', 'Data Limita', 'Status', 'Categorii']
 
     print(tabulate(tabel, headers=antet, tablefmt='grid'))
     
@@ -63,8 +66,10 @@ def adaugare_task():
         except ValueError:
             print('Format data invalida. Incercati din nou.')
     status='Necompletat'
+    print('Introduceti categoriile din care face parte task-ul (separate prin |):')
+    categorii = input()
     with open('taskuri.txt', 'a') as f:
-        f.write(f"{task},{descriere},{prioritate},{task_ddl},{status}\n")
+        f.write(f"{task},{descriere},{prioritate},{task_ddl},{status},{categorii}\n")
         print('Task adaugat cu succes.')
     print('-----------------------------------')
 
@@ -163,6 +168,32 @@ def cautare_task():
             print('Nu s-au gasit taskuri care sa corespunda criteriului de cautare.')
     print('-----------------------------------')
 
+def exportare_taskuri_csv():
+    with open('taskuri.txt', 'r') as f:
+        taskuri = f.readlines()
+    with open('taskuri_export.csv', 'w') as f:
+        f.write('Nume Task | Descriere | Prioritate | Data Limita | Status | Categorii\n')
+        for task in taskuri:
+            f.write(task)
+    print('Taskurile au fost exportate in "taskuri_export.csv".')
+
+def importare_taskuri_csv():
+    try:
+        with open('taskuri_import.csv', 'r') as f:
+            lines = f.readlines()[1:]  
+        if not lines:
+            print('Fisierul "taskuri_import.csv" este gol.')
+            return
+        with open('taskuri.txt', 'a') as f:
+            for line in lines:
+                if line.strip():
+                    if not line.endswith('\n'):
+                        line += '\n'
+                f.write(line)
+        print('Taskurile au fost importate din "taskuri_import.csv".')
+    except FileNotFoundError:
+        print('Fisierul "taskuri_import.csv" nu a fost gasit.')
+
 print('===================================')
 print('Bine ati venit in aplicatia de gestionare a taskurilor!')
 while(1):
@@ -173,11 +204,14 @@ while(1):
     print('4. Modificare status task (complet/incomplet)')
     print('5. Stergere toate taskurile')
     print('6. Editare task')
-    print('7. Cautare task dupa nume/descriere')
-    print('8. Iesire')
+    print('7. Filtrare taskuri dupa categorii')
+    print('8. Cautare task dupa nume/descriere')
+    print('9. Exportare taskuri')
+    print('10. Importare taskuri')
+    print('11. Iesire')
     print('-----------------------------------')
-    
-    optiune = input('Introduceti optiunea (1-8): ')
+
+    optiune = input('Introduceti optiunea (1-11): ')
     if optiune == '1':
         print('Doriti filtrarea taskurilor? (Da/Nu)')
         filtrare = input().lower()
@@ -224,8 +258,27 @@ while(1):
     elif optiune == '6':
         editare_task()
     elif optiune == '7':
-        cautare_task()  
+        print('Introduceti categoria pentru filtrare:')
+        categorie = input().lower()
+        with open('taskuri.txt', 'r') as f:
+            taskuri = f.readlines()
+            gasit = False
+            for task in taskuri:
+                task_info = task.strip().split(',')
+                categorii = task_info[5].lower().split('|') if len(task_info) > 5 else []
+                if categorie in categorii:
+                    print(f'Task: {task_info[0]}, Descriere: {task_info[1]}, Prioritate: {task_info[2]}, Data limita: {task_info[3]}, Status: {task_info[4]}')
+                    gasit = True
+            if not gasit:
+                print(f'Nu s-au gasit taskuri in categoria "{categorie}".')
+        print('-----------------------------------')
     elif optiune == '8':
+        cautare_task()  
+    elif optiune == '9':
+        exportare_taskuri_csv()
+    elif optiune == '10':
+        importare_taskuri_csv()
+    elif optiune == '11':
         print('Iesire din aplicatie...')
         break
     else:
