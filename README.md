@@ -20,6 +20,15 @@ pip install -r requirements.txt
 
 ### Docker
 
+**Din DockerHub (recomandat):**
+
+```bash
+docker pull virgiistegaru/proiect-map
+docker run -it virgiistegaru/proiect-map
+```
+
+**Sau construiți local:**
+
 ```bash
 docker build -t task-manager .
 docker run -it task-manager
